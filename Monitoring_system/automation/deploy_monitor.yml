@@ -1,0 +1,22 @@
+- name: Automatisation du monitoring CPU/RAM
+  hosts: all
+  become: yes
+  tasks:
+    - name: Copier le script de monitoring sur le serveur
+      copy:
+        src: system_monitor.py
+        dest: /home/{{ ansible_user }}/system_monitor.py
+        mode: '0755'
+  
+    - name: verifier que python3 est installé
+      apt:
+        name: 
+        - python3
+        - python3-pip
+        state: present
+        update_cache: yes
+      
+    - name: Lancer le script de monitoring en arrière-plan
+      shell: nohup python3 /home/{{ ansible_user }}/system_monitor.py > /home/{{ ansible_user }}/monitor.log 2>&1 &
+      args:
+        executable: /bin/bash

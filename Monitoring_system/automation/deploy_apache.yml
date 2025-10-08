@@ -1,0 +1,14 @@
+- name: installer Apache et déployer une page web
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Installer Apache
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+    
+    - name: Déployer page HTML
+      copy:
+        src: ./index.html
+        dest: /var/www/html/index.html
