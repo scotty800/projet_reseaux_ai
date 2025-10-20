@@ -1,0 +1,16 @@
+- name: Déployer les scripts d'audit
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: créer le répertoire distant
+      file:
+        path: /opt/network-analyzer/
+        state: directory
+        mode: '0755'
+
+    - name: Copier les scripts Python
+      copy:
+      src: ../network_scan/
+      dest: /opt/network-analyzer/
+      mode: '0755'

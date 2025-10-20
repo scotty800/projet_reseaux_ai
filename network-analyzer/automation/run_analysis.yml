@@ -1,0 +1,36 @@
+---
+- name: Lancer l’analyse réseau et rapatrier les rapports
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Exécuter le scan du réseau
+      command: python3 /opt/network-analyzer/subnet_scanner.py
+      args:
+        chdir: /opt/network-analyzer/
+
+    - name: Exécuter la collecte SSH
+      command: python3 /opt/network-analyzer/ssh_collector.py
+      args:
+        chdir: /opt/network-analyzer/
+
+    - name: Lancer l’audit des ports
+      command: python3 /opt/network-analyzer/port_audit.py
+      args:
+        chdir: /opt/network-analyzer/
+
+    - name: Vérifier les règles critiques
+      command: python3 /opt/network-analyzer/rule_checker.py
+      args:
+        chdir: /opt/network-analyzer/
+
+    - name: Détection IA des risques
+      command: python3 /opt/network-analyzer/ai_risk_detector.py
+      args:
+        chdir: /opt/network-analyzer/
+
+    - name: Rapatrier les rapports générés
+      fetch:
+        src: /opt/network_audit/security_analysis/
+        dest: ./collected_reports/
+        flat: no
