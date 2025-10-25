@@ -1,0 +1,28 @@
+---
+- name: Déployer les collectors IoT sur les Raspberry Pi
+  hosts: iot_devices      # Nom du groupe défini dans ton inventory Ansible
+  become: yes             # Nécessaire si tu dois copier dans un dossier nécessitant des droits root
+  vars:
+    dest_path: /home/pi/smart_sensors  # Dossier de destination sur la Pi
+
+  tasks:
+    - name: Créer le dossier de destination si nécessaire
+      file:
+        path: "{{ dest_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copier tous les scripts du dossier sensors
+      copy:
+        src: ../sensors/       # Chemin relatif depuis ton playbook vers tes scripts
+        dest: "{{ dest_path }}/"
+        owner: pi
+        group: pi
+        mode: '0644'
+
+    - name: Lancer le collector en tâche de fond
+      shell: "nohup python3 {{ dest_path }}/collector.py &"
+      args:
+        chdir: "{{ dest_path }}"   # On s'assure d'être dans le bon dossier
+      async: 0                     # Exécution immédiate
+      poll: 0                      # Pas besoin d'attendre que la tâche finisse
