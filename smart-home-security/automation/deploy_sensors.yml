@@ -1,0 +1,27 @@
+---
+- name: Déployer les capteurs IoT
+  hosts: iot_devices
+  become: yes
+  tasks:
+    - name: Créer le dossier de destination
+      file:
+        path: /home/pi/smart_sensors
+        state: directory
+        mode: '0755'
+
+    - name: Copier les scripts de capteurs
+      copy:
+        src: ./sensors/
+        dest: /home/pi/smart_sensors/
+        mode: '0755'
+
+    - name: Installer Python3 si nécessaire
+      apt:
+        name: python3
+        state: present
+        update_cache: yes
+
+    - name: Lancer le collector en arrière-plan
+      shell: "nohup python3 /home/pi/smart_sensors/collector.py > /home/pi/collector.log 2>&1 &"
+      args:
+        executable: /bin/bash
